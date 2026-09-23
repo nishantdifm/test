@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding: 20px 12px;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    .video-wrapper {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      justify-content: center;
+    }
+    .video-wrapper video {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.08);
+      outline: none;
+      display: block;
+      background: #111111;
+    }
+    .countdown {
+      display: flex;
+      align-items: baseline;
+      gap: clamp(0.5rem, 2.5vw, 1.5rem);
+      max-width: 100%;
+      justify-content: center;
+    }
+    .time-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+    .val {
+      font-size: clamp(2rem, 9vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .lbl {
+      font-size: clamp(0.65rem, 2vw, 0.95rem);
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #777777;
+      margin-top: 0.5rem;
+    }
+    .sep {
+      font-size: clamp(1.6rem, 7vw, 4.5rem);
+      font-weight: 300;
+      color: #444444;
+      line-height: 1;
+      align-self: center;
+      margin-bottom: 1.4rem;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        gap: 1.4rem;
+      }
+      .video-wrapper {
+        max-width: 290px;
+        width: 88%;
+      }
+      .countdown {
+        gap: 0.4rem;
+      }
+      .lbl {
+        letter-spacing: 1px;
+        margin-top: 0.35rem;
+      }
+      .sep {
+        margin-bottom: 0.9rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .video-wrapper {
+        max-width: 250px;
+      }
+      .countdown {
+        gap: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Video in Center -->
+  <div class="video-wrapper">
+    <video src="30821.mp4" autoplay loop muted playsinline controls></video>
+  </div>
+
+  <!-- Countdown Timer below video -->
+  <div class="countdown">
+    <div class="time-unit">
+      <span class="val" id="days">04</span>
+      <span class="lbl">Days</span>
+    </div>
+    <span class="sep">:</span>
+    <div class="time-unit">
+      <span class="val" id="hours">00</span>
+      <span class="lbl">Hours</span>
+    </div>
+    <span class="sep">:</span>
+    <div class="time-unit">
+      <span class="val" id="minutes">00</span>
+      <span class="lbl">Minutes</span>
+    </div>
+    <span class="sep">:</span>
+    <div class="time-unit">
+      <span class="val" id="seconds">00</span>
+      <span class="lbl">Seconds</span>
+    </div>
+  </div>
+
+  <script>
+    const FOUR_DAYS_MS = 4 * 24 * 60 * 60 * 1000;
+    const KEY = 'minimal_timer_end';
+
+    function getTarget() {
+      let t = localStorage.getItem(KEY);
+      const now = Date.now();
+      if (!t || parseInt(t, 10) <= now) {
+        t = now + FOUR_DAYS_MS;
+        localStorage.setItem(KEY, t);
+      }
+      return parseInt(t, 10);
+    }
+
+    let targetTime = getTarget();
+    const dEl = document.getElementById('days');
+    const hEl = document.getElementById('hours');
+    const mEl = document.getElementById('minutes');
+    const sEl = document.getElementById('seconds');
+
+    function pad(n) {
+      return n < 10 ? '0' + n : n;
+    }
+
+    function update() {
+      const now = Date.now();
+      const diff = targetTime - now;
+      if (diff <= 0) {
+        dEl.textContent = '00';
+        hEl.textContent = '00';
+        mEl.textContent = '00';
+        sEl.textContent = '00';
+        return;
+      }
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      dEl.textContent = pad(d);
+      hEl.textContent = pad(h);
+      mEl.textContent = pad(m);
+      sEl.textContent = pad(s);
+    }
+
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+</html>
